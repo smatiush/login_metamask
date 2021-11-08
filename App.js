@@ -1,16 +1,22 @@
+
 import React, { Component } from 'react';
+import  { Redirect } from 'react-router-dom'
 import logo from './logo.gif';
 import './App.css';
 import detectEthereumProvider from '@metamask/detect-provider'
-import  { Redirect } from 'react-router-dom'
+import Session from "react-session-api"
+import Signature_badge from "./components/badge_view_sig.js"
+import axios from "axios"
+axios.defaults.baseURL = 'http://127.0.0.1:3001';
+axios.defaults.headers.post['Content-Type'] ='application/json';
 
 class App extends Component {
-state = {
-    data: null
-  };
-  /*async componentDidMount(){
-    await this.handleSignMessage()
-  }*/
+  constructor(){
+    super()
+    this.state = {
+            signature: ''
+        }
+    }
 
   handleSignMessage = async () => {
     const ethereum = await detectEthereumProvider()
@@ -18,7 +24,8 @@ state = {
     const accounts = await ethereum.request({ method: 'eth_requestAccounts'});
     const account = accounts[0];
     var signature = await ethereum.request({ method: 'personal_sign', params: [ message, account ]});
-    await this.callBackendAPI(signature)
+    this.setState({signature: signature})
+    return await this.callBackendAPI(this.state)
   };
 
   /*callBackendAPI = async (sig) => {
@@ -33,13 +40,9 @@ state = {
 
 
   callBackendAPI = async (sig) => {
-    const response = await fetch('/admin', {
-      method:'post',
-      body:JSON.stringify({
-        signature : sig})
-    })
-  }
-
+      axios.post('http://127.0.0.1:3001/login', this.state)
+      .then((res)=>{console.log(res)})
+}
 
   render() {
     return (
@@ -48,8 +51,11 @@ state = {
           <img src={logo} className="App-logo" alt="logo" />
           <h1 className="App-title">Gambaru  login with metamask</h1>
           <button type="button" className='login_btn' onClick={this.handleSignMessage}>login</button>
+          <div className="component-div set float-left">
+            <p>Signature badge</p>
+            <Signature_badge />
+          </div>
           </header>
-        <p className="App-intro">{this.state.data}</p>
       </div>
     );
   };
