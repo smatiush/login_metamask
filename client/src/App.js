@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import logo from './logo.gif';
 import './App.css';
 import detectEthereumProvider from '@metamask/detect-provider'
-//import  { Redirect } from 'react-router-dom'
 import axios from 'axios'
 
 axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
@@ -11,9 +10,6 @@ class App extends Component {
 state = {
     data: null
   };
-  /*async componentDidMount(){
-    await this.handleSignMessage()
-  }*/
 
   handleSignMessage = async () => {
     const ethereum = await detectEthereumProvider()
@@ -24,24 +20,9 @@ state = {
     await this.callBackendAPI(signature)
   };
 
-  /*callBackendAPI = async (sig) => {
-    const response = await fetch('/admin')
-    const body = await response;
-    if (response.status !== 200) {
-      throw Error(body.message)
-    }
-    console.log(body)
-    return body;
-  };*/
 
 
   callBackendAPI = async (sig) => {
-    /*const response = await fetch('http://127.0.0.1:5000/admin', {
-      method:'POST',
-      //headers: { "Content-Type": "application/json" },
-      body:JSON.stringify(sig)
-    })
-    console.log(response)*/
     axios.post('http://127.0.0.1:5000/admin',{
       headers: {'Access-Control-Allow-Origin': 'http://127.0.0.1:5000/admin'},
       params:sig
