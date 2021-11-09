@@ -5,7 +5,7 @@ import './badge_view_sig.css';
 class Signature_badge extends Component {
   constructor() {
     super();
-    this.state = {signature: 0}
+    this.state = {signature: ''}
   }
 
   componentDidMount() {
@@ -17,12 +17,9 @@ class Signature_badge extends Component {
 
   render() {
     return (
-      <h5>
-        signature :{this.state.signature}
         <span className="badge">
           {this.state.signature}
         </span>
-      </h5>
     );
   }
 }
