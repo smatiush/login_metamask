@@ -4,6 +4,7 @@ const path = require("path")
 const bodyParser = require("body-parser")
 router = express.Router();
 
+
 const PORT = 3001;
 
 const app = express();
@@ -13,30 +14,22 @@ const corsOptions = {
   origin: '*'
 }
 app.use(cors(corsOptions))
+app.use('/', router)
 
-router.route('/').get((req, res)=>{
-  console.log('simple get req')
-  res.send('lol')
-  res.sendFile(path.join(__dirname, "auth.html"))
-})
-
-router.route('/login').post((req,res,next)=>{
-  console.log(req.body)
-  if (req.body.signature != ''){
-    res.redirect('./auth.html')
+router.post("/login", (req, res) => {
+  console.log(req.body.signature)
+  if(req.body.signature == 'null'){
+    console.log('pre-invio')
+    res.send({'logedIn': false ,'signature':req.body.signature})
+    console.log('inviata')
+    res.end()
+  } else {
+    console.log('pre-invio')
+    res.send({'logedIn': true ,'signature':req.body.signature})
+    console.log('inviata')
+    res.end()
   }
 })
-
-/*app.get("/api", (req, res) => {
-  res.send('lol')
-  res.sendFile(path.join(__dirname, "auth.html"))
-  //res.redirect('../auth.html');
-});*/
-
-app.post("/login", (req, res) => {
-  console.log(req.body)
-})
-
 
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
