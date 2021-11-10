@@ -1,27 +1,14 @@
 import React, { Component } from "react";
 import Session from "react-session-api";
+import ReactDOM from "react-dom";
 import './badge_view_sig.css';
 
-class Signature_badge extends Component {
-  constructor() {
-    super();
-    this.state = {signature: ''}
-  }
-
-  componentDidMount() {
-    const getSig = (data) => {
-      this.setState({ signature: data["signature"] });
-    };
-    Session.onSet(getSig)
-  }
-
-  render() {
-    return (
-        <span className="badge">
-          {this.state.signature}
-        </span>
+const Signature_badge = (props) => {
+  return (
+      <span className="badge">
+        <h5> {props.signature} </h5>
+      </span>
     );
   }
-}
 
 export default Signature_badge;
