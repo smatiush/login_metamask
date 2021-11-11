@@ -11,14 +11,17 @@ import axios from "axios"
 
 class App extends Component {
   constructor(){
-    axios.defaults.baseURL = 'http://127.0.0.1:3001';
-    axios.defaults.headers.post['Content-Type'] ='application/json';
-    axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*'
     super()
     this.state = {
-            signature: 'null'
+            signature: 'null',
+            account: 'null',
+            message: 'null'
         }
     }
+
+  componentDidMount(){
+    this.login()
+  }
 
   login = async () => {
     const ethereum = await detectEthereumProvider()
@@ -27,37 +30,36 @@ class App extends Component {
     const account = accounts[0];
     let signature = await ethereum.request({ method: 'personal_sign', params: [ message, account ]});
     this.state.signature = signature
+    this.state.account = account
+    this.state.message = message
     console.log('session data:' + this.state.signature)
     //await this.callBackendAPI()
     //return true
   }
 
-
-  callBackendAPI = () => {
-    this.login().then(()=>{let response = axios.post('http://127.0.0.1:3001/login', {'signature':this.state.signature})
-      .then((res)=>{return res})//promise pending
-      response.then((final_res) => {
-        if(final_res.data.logedIn == false){
-          console.log(final_res.data.logedIn)
-          return final_res.data.signature
-        }else{
-          console.log(final_res.data.signature)
-          return final_res.data.signature
-        }
-      })
-    });
+  data_toSend = () => {
+    axios.defaults.baseURL = 'http://127.0.0.1:3001';
+    axios.defaults.headers.post['Content-Type'] ='application/json';
+    axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*'
+    let response = axios.post('http://127.0.0.1:3001/login', {'signature':this.state.signature, 'account': this.state.account, 'message':this.state.message})
+        .then((res)=>{return res})//promise pending
+    let final_response = response.then((final_res) => {
+            console.log(final_res.data.logedIn)
+            return final_res.data.logedIn
+          })
+    console.log(final_response)
+    return 'log_in'
   }
-
 
   render() {
       return (
         <div className="App">
           <header className="App-header">
             <img src={logo} className="App-logo" alt="logo" />
-            <button type="button" className='login_btn' onClick={this.callBackendAPI}>call back-end</button>
+            <button type="button" className='login_btn' onClick={this.data_toSend}>login</button>
             <div className="component-div set float-left">
-                <p className="badge badge-success badge-outlined">Signature from back_end:</p>
-                <Signature_badge signature={this.callBackendAPI}/>
+                <p className="badge badge-success badge-outlined">are you logged?</p>
+                <Signature_badge data={this.data_toSend}/>
             </div>
             </header>
         </div>);
