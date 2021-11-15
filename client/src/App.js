@@ -1,12 +1,12 @@
 
 import React, { Component } from 'react';
-import  { Redirect } from 'react-router-dom'
+import {Outlet, Link } from "react-router-dom";
 import logo from './logo.gif';
 import './App.css';
 import detectEthereumProvider from '@metamask/detect-provider'
 import Session from "react-session-api"
-import Signature_badge from "./components/badge_view_sig.js"
 import axios from "axios"
+import Login from "./pages/Login"
 
 
 class App extends Component {
@@ -15,13 +15,10 @@ class App extends Component {
     this.state = {
             signature: 'null',
             account: 'null',
-            message: 'null'
+            message: 'null',
+            auth: false
         }
     }
-
-  componentDidMount(){
-    this.login()
-  }
 
   login = async () => {
     const ethereum = await detectEthereumProvider()
@@ -33,34 +30,45 @@ class App extends Component {
     this.state.account = account
     this.state.message = message
     console.log('session data:' + this.state.signature)
-    //await this.callBackendAPI()
-    //return true
   }
 
-  data_toSend = () => {
+  data_toSend = async () => {
+    await this.login()
     axios.defaults.baseURL = 'http://127.0.0.1:3001';
     axios.defaults.headers.post['Content-Type'] ='application/json';
     axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*'
     let response = axios.post('http://127.0.0.1:3001/login', {'signature':this.state.signature, 'account': this.state.account, 'message':this.state.message})
         .then((res)=>{return res})//promise pending
     let final_response = response.then((final_res) => {
-            console.log(final_res.data.logedIn)
             return final_res.data.logedIn
           })
     console.log(final_response)
-    return 'log_in'
+    this.handleButtonDashboard()
   }
+
+handleButtonDashboard = async () => {
+  let credentials  = await axios.get('http://127.0.0.1:3001/credential')
+  if(credentials.data.auth.logedin == true){
+    this.setState({'auth':true})
+  } else {
+    this.setState({'auth':false})
+  }
+}
+
+shouldComponentUpdate(nextState) {
+return this.state.auth != nextState.auth;
+}
 
   render() {
       return (
         <div className="App">
           <header className="App-header">
             <img src={logo} className="App-logo" alt="logo" />
+            <p>
+            <Link to={`/login/${this.state.auth}`} className='login_btn'>open dashboard</Link>
+            <Outlet />
+            </p>
             <button type="button" className='login_btn' onClick={this.data_toSend}>login</button>
-            <div className="component-div set float-left">
-                <p className="badge badge-success badge-outlined">are you logged?</p>
-                <Signature_badge data={this.data_toSend}/>
-            </div>
             </header>
         </div>);
       };
