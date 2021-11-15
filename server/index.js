@@ -15,6 +15,8 @@ const corsOptions = {
 }
 app.use(cors(corsOptions))
 app.use('/', router)
+let session = {}
+
 
 router.post("/login", (req, res) => {
   console.log('pre-invio')
@@ -22,15 +24,21 @@ router.post("/login", (req, res) => {
   let adr = account.recover(req.body.message, req.body.signature)
   if (adr = req.body.account){
     console.log(adr)
+    session.logedin = true
     res.send({'logedIn': true})
     console.log('inviata')
     res.end()
   } else {
     console.log(adr)
+    session.logedin = false
     res.send({'logedIn': false})
     console.log('inviata')
     res.end()
   }
+})
+
+router.get('/credential', (req, res)=> {
+  res.send({'auth':session})
 })
 
 app.listen(PORT, () => {
